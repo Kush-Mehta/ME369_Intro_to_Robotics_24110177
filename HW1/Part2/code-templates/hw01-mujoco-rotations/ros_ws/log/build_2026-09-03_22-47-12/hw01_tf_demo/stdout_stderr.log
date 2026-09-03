@@ -1,0 +1,22 @@
+running develop
+running egg_info
+creating hw01_tf_demo.egg-info
+writing hw01_tf_demo.egg-info/PKG-INFO
+writing dependency_links to hw01_tf_demo.egg-info/dependency_links.txt
+writing entry points to hw01_tf_demo.egg-info/entry_points.txt
+writing requirements to hw01_tf_demo.egg-info/requires.txt
+writing top-level names to hw01_tf_demo.egg-info/top_level.txt
+writing manifest file 'hw01_tf_demo.egg-info/SOURCES.txt'
+reading manifest file 'hw01_tf_demo.egg-info/SOURCES.txt'
+writing manifest file 'hw01_tf_demo.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/lib/python3.12/site-packages/hw01-tf-demo.egg-link (link to .)
+Installing tf_broadcaster_node script to /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/lib/hw01_tf_demo
+
+Installed /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo
+running install_data
+creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index
+creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index/resource_index
+creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index/resource_index/packages
+copying resource/hw01_tf_demo -> /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index/resource_index/packages
+copying package.xml -> /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/hw01_tf_demo

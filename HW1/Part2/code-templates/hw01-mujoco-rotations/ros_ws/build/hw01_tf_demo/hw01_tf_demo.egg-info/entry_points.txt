@@ -1,0 +1,2 @@
+[console_scripts]
+tf_broadcaster_node = hw01_tf_demo.tf_broadcaster_node:main

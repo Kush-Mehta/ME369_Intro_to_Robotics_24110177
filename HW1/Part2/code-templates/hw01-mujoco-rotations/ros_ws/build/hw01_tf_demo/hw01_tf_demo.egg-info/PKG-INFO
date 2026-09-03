@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: hw01-tf-demo
+Version: 0.1.0
+Summary: ME 639 HW1 Task 3: TF broadcast demo for current-frame vs. fixed-frame rotation composition.
+Maintainer: Madhu Vadali
+Maintainer-email: madhu.vadali@iitgn.ac.in
+License: MIT
