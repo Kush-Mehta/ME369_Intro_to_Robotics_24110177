@@ -1,0 +1,24 @@
+[0.946s] Invoking command in '/home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo/prefix_override:/home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo/build --no-deps install_data
+[1.250s] running develop
+[1.448s] running egg_info
+[1.448s] creating hw01_tf_demo.egg-info
+[1.467s] writing hw01_tf_demo.egg-info/PKG-INFO
+[1.468s] writing dependency_links to hw01_tf_demo.egg-info/dependency_links.txt
+[1.468s] writing entry points to hw01_tf_demo.egg-info/entry_points.txt
+[1.468s] writing requirements to hw01_tf_demo.egg-info/requires.txt
+[1.468s] writing top-level names to hw01_tf_demo.egg-info/top_level.txt
+[1.468s] writing manifest file 'hw01_tf_demo.egg-info/SOURCES.txt'
+[1.506s] reading manifest file 'hw01_tf_demo.egg-info/SOURCES.txt'
+[1.507s] writing manifest file 'hw01_tf_demo.egg-info/SOURCES.txt'
+[1.527s] running build_ext
+[1.527s] Creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/lib/python3.12/site-packages/hw01-tf-demo.egg-link (link to .)
+[1.528s] Installing tf_broadcaster_node script to /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/lib/hw01_tf_demo
+[1.528s] 
+[1.528s] Installed /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo
+[1.528s] running install_data
+[1.528s] creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index
+[1.528s] creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index/resource_index
+[1.528s] creating /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index/resource_index/packages
+[1.528s] copying resource/hw01_tf_demo -> /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/ament_index/resource_index/packages
+[1.528s] copying package.xml -> /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/share/hw01_tf_demo
+[1.557s] Invoked command in '/home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo/prefix_override:/home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/install/hw01_tf_demo/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/kush-mehta/itr/ME369_Intro_to_Robotics_24110177/HW1/Part2/code-templates/hw01-mujoco-rotations/ros_ws/build/hw01_tf_demo/build --no-deps install_data

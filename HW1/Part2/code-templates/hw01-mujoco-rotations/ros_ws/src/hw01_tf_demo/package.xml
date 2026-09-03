@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>hw01_tf_demo</name>
+  <version>0.1.0</version>
+  <description>
+    ME 639 HW1, Task 3 (optional/bonus): broadcast body-frame and
+    space-frame TF frames while toggling between current-frame and
+    fixed-frame rotation composition, for viewing in rviz2.
+  </description>
+  <maintainer email="madhu.vadali@iitgn.ac.in">Madhu Vadali</maintainer>
+  <license>MIT</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

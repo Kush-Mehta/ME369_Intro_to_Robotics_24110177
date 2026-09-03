@@ -1,0 +1,9 @@
+source;share/hw01_tf_demo/hook/pythonpath.ps1
+source;share/hw01_tf_demo/hook/pythonpath.dsv
+source;share/hw01_tf_demo/hook/pythonpath.sh
+source;share/hw01_tf_demo/hook/ament_prefix_path.ps1
+source;share/hw01_tf_demo/hook/ament_prefix_path.dsv
+source;share/hw01_tf_demo/hook/ament_prefix_path.sh
+source;../../build/hw01_tf_demo/share/hw01_tf_demo/hook/pythonpath_develop.ps1
+source;../../build/hw01_tf_demo/share/hw01_tf_demo/hook/pythonpath_develop.dsv
+source;../../build/hw01_tf_demo/share/hw01_tf_demo/hook/pythonpath_develop.sh

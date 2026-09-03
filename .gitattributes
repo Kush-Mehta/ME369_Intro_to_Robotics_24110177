@@ -1,0 +1,2 @@
+Lab3/Franka_video.mp4 filter=lfs diff=lfs merge=lfs -text
+Lab3/Workspace_plotting_csvs_and_3d_html_file_[[:space:]]for_workspace_visualization/franka_workspace.csv filter=lfs diff=lfs merge=lfs -text
