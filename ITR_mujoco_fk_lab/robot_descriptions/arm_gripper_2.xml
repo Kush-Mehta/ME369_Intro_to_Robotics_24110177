@@ -1,0 +1,17 @@
+<mujoco model="heal_with_gripper">
+  <compiler angle="radian" coordinate="local" meshdir="assets" texturedir="assets"/>
+
+  <option gravity="0 0 -9.81" integrator="RK4" timestep="0.002"/>
+
+  <!-- Include robot model -->
+  <include file="/Users/afraz/Imitation-Learning-For-Contact-Rich-Manipulation-Task/Imitation-Learning-For-Contact-Rich-Manipulation-Task/robot_descriptions/single_arm_heal_effort_actuation_rs_mj.xml"/>
+
+  <!-- Attach the gripper to right_hand -->
+  <worldbody>
+    <body name="end_effector" pos="0 0 0" euler="0 0 0">
+      <body name="right_gripper_base" pos="0 0 0">
+        <include file="/Users/afraz/Imitation-Learning-For-Contact-Rich-Manipulation-Task/Imitation-Learning-For-Contact-Rich-Manipulation-Task/robot_descriptions/robotiq_2f85_v4/gripper.xml"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

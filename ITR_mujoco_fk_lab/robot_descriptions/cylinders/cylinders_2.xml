@@ -1,0 +1,37 @@
+<mujoco model="cylinder_assembly">
+    <compiler angle="radian" coordinate="local" meshdir="." />
+    <option gravity="0 0 -9.81" />
+
+    <asset>
+        <material name="silver" rgba="0.75 0.75 0.75 1" reflectance="0.3"/>
+        <mesh name="Solid_Cylinder" file="cylinder_meshes/Solid_Cylinder.stl"/>
+        <mesh name="Hollow_Cylinder" file="cylinder_meshes/Hollow_Cylinder.stl"/>
+    </asset>
+
+    <worldbody>
+        <body name="main_cylinder_body" pos="0.2 0.325 0.0" quat="1 0 0 0">
+            <freejoint name="free_joint_main_cylinder"/>
+            <inertial pos="0 0 0" mass="0.2" diaginertia="1e-5 1e-5 1e-5"/>
+
+            <!-- Central solid cylinder -->
+            <geom name="main_cylinder" type="mesh" mesh="Solid_Cylinder"
+                  pos="0 0 0" material="silver" conaffinity="1" contype="1"
+                  mass="0.05" solimp="0.99 0.99 0.01" solref="0.01 1"
+                  condim="4" friction="1.0 1.0 10"/>
+
+            <!-- Flap A -->
+            <body name="flap_a" pos="0 0 0.005" quat="0 0 0.7071 0">
+                <geom name="hollow_flap_a" type="mesh" mesh="Hollow_Cylinder"
+                      pos="0 0 0" material="silver" conaffinity="1" contype="1"
+                      mass="0.0001"/>
+            </body>
+
+            <!-- Flap B -->
+            <body name="flap_b" pos="0 0 0">
+                <geom name="hollow_flap_b" type="mesh" mesh="Hollow_Cylinder"
+                      pos="0 0 0" material="silver" conaffinity="1" contype="1"
+                      mass="0.0001"/>
+            </body>
+        </body>
+    </worldbody>
+</mujoco>

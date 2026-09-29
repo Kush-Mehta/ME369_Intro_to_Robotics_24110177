@@ -1,0 +1,31 @@
+<mujoco model="panda_scene_with_objects">
+  <!-- Include the Franka robot scene -->
+  <include file="mjx_scene.xml"/>
+
+  <!-- Include the plate model (assumed to be saved as plate_model.xml) -->
+  <include file="/home/iitgn-robotics-2/s.p.openvla/mujoco_scanned_objects/models/Ecoforms_Plate_S20Avocado/model.xml"/>
+
+  <worldbody>
+    <!-- Add a green cube with a freejoint (draggable) -->
+    <body name="box" pos="0.3 -0.5 0.03">
+      <freejoint/>
+      <geom type="box" name="box_geom" size="0.04 0.04 0.03"
+            condim="3" friction="1 .03 .003" rgba="1 0 0 1"
+            contype="2" conaffinity="1" solref="0.01 1"/>
+    </body>
+
+    <!-- Add the imported plate geometry and make it
+     draggable -->
+  <camera name="realsense_sim" mode="fixed" pos="1.6 0 0.8" euler="0.0 1.0472 1.5708" fovy="50"/>
+
+  </worldbody>
+
+  <!-- Keyframes for Franka -->
+  <!-- <keyframe>
+    <key name="home"
+      qpos="0 0.785 0 2.356 0 1.571 0.785 0.04 0.04 0.7 0 0.03 1 0 0 0 "
+      ctrl="0 0.3 0 -1.57079 0 2.0 -0.7853 0.04"/>
+  </keyframe> -->
+</mujoco>
+
+<!-- pos 2 0 1.5 -->

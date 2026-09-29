@@ -1,0 +1,7 @@
+<mujoco>
+  <asset>
+    <mesh name="Solid_Cylinder" file="robot_descriptions/cylinders/cylinder_meshes/Solid_Cylinder.stl"/>
+    <mesh name="Hollow_Cylinder" file="robot_descriptions/cylinders/cylinder_meshes/Hollow_Cylinder.stl"/>
+  </asset>
+</mujoco>
+
