@@ -1,0 +1,18 @@
+<!-- this xml loads franka robot(with attached gripper)+table arena (taken from robosuite)+a cube+ a yellow plate -->
+
+<mujoco model="table_with_panda">
+    <!-- Corrected include paths -->
+    <include file="arena_description/table_arena.xml" />
+    <include file="robot_description/mjx_panda.xml" />
+    <include file="plate_description/model.xml"/>
+
+    <worldbody>
+      <!-- Add a green cube with a freejoint (draggable) -->
+      <body name="box" pos="0.2 -0.4 0.83">
+        <joint name="cube" type="free"/>
+        <geom type="box" name="box_geom" size="0.03 0.03 0.03"
+              condim="3" friction="1 0.5 0.5" rgba="1 0 0 1"
+              contype="2" conaffinity="1" solref="0.01 1"/>
+      </body>
+    </worldbody>
+</mujoco>

@@ -1,0 +1,15 @@
+name: itr_fk
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy>=1.24
+  - scipy>=1.10
+  - mujoco>=3.0
+  - cvxpy>=1.3
+  - pyyaml>=6.0
+  - pynput>=1.7
+  - transforms3d>=0.4
+  - pip:
+      - mujoco-py>=2.1.2.14  # optional; only if scripts use it
