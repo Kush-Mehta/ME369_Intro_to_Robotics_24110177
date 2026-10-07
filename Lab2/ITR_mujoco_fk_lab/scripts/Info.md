@@ -1,0 +1,1 @@
+Change robot = 'f' parameter to 'h' - to display heal instead of franka and vice versa
