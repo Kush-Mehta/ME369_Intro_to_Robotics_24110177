@@ -170,6 +170,26 @@ def draw_sphere(scene, slot, xyz, radius, rgba):
         np.array(rgba, dtype=np.float32),
     )
 
+
+def print_overlay(cfg, mujoco_xyz, dh_xyz, error_mm, f1=0.0, f2=0.0):
+    """
+    Print a live-updating overlay to the terminal using ANSI escape codes.
+    This is the fallback when mjr_overlay / set_texts are unavailable.
+    Moves cursor to top-left and rewrites the block every frame.
+    """
+    lines = [
+        f"\033[1m{cfg['name']}\033[0m",
+        "",
+        f"  MuJoCo   x={mujoco_xyz[0]:+.4f}   y={mujoco_xyz[1]:+.4f}   z={mujoco_xyz[2]:+.4f}",
+        f"  DH FK    x={dh_xyz[0]:+.4f}   y={dh_xyz[1]:+.4f}   z={dh_xyz[2]:+.4f}",
+        f"  Error    {error_mm:.4f} mm",
+    ]
+    if cfg["has_gripper"]:
+        lines += ["", f"  Gripper  {f1*1000:.1f} mm  /  {f2*1000:.1f} mm"]
+
+    # \033[H = move cursor home (top-left), \033[J = clear to end of screen
+    print("\033[H\033[J" + "\n".join(lines), end="", flush=True)
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
@@ -189,8 +209,74 @@ def main():
     print("→ Top-left overlay: MuJoCo vs DH position + error")
     print("→ GREEN sphere = MuJoCo end-effector   RED sphere = DH result")
 
-    viewer = mujoco.viewer.launch_passive(model, data)
-    viewer.user_scn.ngeom = 2   # 2 slots: one for each sphere
+    # Shared state written each physics tick, read by the render callback.
+    state = {
+        "mujoco_xyz" : np.zeros(3),
+        "dh_xyz"     : np.zeros(3),
+        "error_mm"   : 0.0,
+        "f1"         : 0.0,
+        "f2"         : 0.0,
+    }
+
+    # ── Render callback: called by the viewer on every frame ──────────────
+    # mjr_overlay draws text directly onto the OpenGL framebuffer – this is
+    # the only approach that reliably works in the passive viewer across all
+    # MuJoCo 3.x builds (set_texts has an unstable API).
+    def render_callback(model, data):
+        mj_xyz = state["mujoco_xyz"]
+        dk_xyz = state["dh_xyz"]
+        err    = state["error_mm"]
+
+        left_col = (
+            f"{cfg['name']}\n"
+            f"\n"
+            f"MuJoCo\n"
+            f"DH FK\n"
+            f"Error"
+        )
+        right_col = (
+            f"\n"
+            f"\n"
+            f"x={mj_xyz[0]:+.4f}  y={mj_xyz[1]:+.4f}  z={mj_xyz[2]:+.4f}\n"
+            f"x={dk_xyz[0]:+.4f}  y={dk_xyz[1]:+.4f}  z={dk_xyz[2]:+.4f}\n"
+            f"{err:.4f} mm"
+        )
+        if cfg["has_gripper"]:
+            left_col  += f"\n\nGripper (each finger)"
+            right_col += f"\n\n{state['f1']*1000:.1f} mm  /  {state['f2']*1000:.1f} mm"
+
+        # mjr_overlay needs the current OpenGL viewport + context.
+        # The passive viewer exposes them via viewer.ctx and viewer.viewport
+        # when called from inside the render callback.
+        mujoco.mjr_overlay(
+            mujoco.mjtFontScale.mjFONTSCALE_150,
+            mujoco.mjtGridPos.mjGRID_TOPLEFT,
+            viewer.viewport,
+            left_col,
+            right_col,
+            viewer.ctx,
+        )
+
+    # ── Launch viewer – try render_callback first (MuJoCo >= 3.1),        ──
+    # ── fall back to plain launch_passive (older builds).                  ──
+    # ── WAYLAND FIX: force X11 backend so launch_passive doesn't freeze.   ──
+    os.environ.setdefault("MUJOCO_GL", "glx")        # use GLX/X11, not EGL/Wayland
+    os.environ.setdefault("DISPLAY", ":0")            # ensure X display is set
+
+    try:
+        viewer = mujoco.viewer.launch_passive(
+            model, data,
+            render_callback=render_callback,
+        )
+        use_terminal_overlay = False
+    except TypeError:
+        # Old MuJoCo: launch_passive does not accept render_callback.
+        # Fall back to plain passive viewer + terminal overlay.
+        viewer = mujoco.viewer.launch_passive(model, data)
+        use_terminal_overlay = True
+
+    # Start with zero user geoms; we reset and redraw every frame.
+    viewer.user_scn.ngeom = 0
 
     while viewer.is_running():
 
@@ -213,8 +299,8 @@ def main():
                 mujoco.mj_step(model, data)             # physics: moves gripper
             # Read back actual finger positions and show them
             fq = cfg["finger_qpos"]
-            f1 = data.qpos[fq[0]]   # metres, 0 = closed, 0.04 = open
-            f2 = data.qpos[fq[1]]
+            state["f1"] = data.qpos[fq[0]]   # metres, 0 = closed, 0.04 = open
+            state["f2"] = data.qpos[fq[1]]
         else:
             mujoco.mj_forward(model, data)
 
@@ -227,34 +313,22 @@ def main():
         # ── Error ──────────────────────────────────────────────────────────
         error_mm = np.linalg.norm(mujoco_xyz - dh_xyz) * 1000.0
 
-        # ── Overlay text ───────────────────────────────────────────────────
-        left_col = (
-            f"{cfg['name']}\n"
-            f"\n"
-            f"MuJoCo   x      y      z\n"
-            f"DH FK    x      y      z\n"
-            f"Error"
-        )
-        right_col = (
-            f"\n"
-            f"\n"
-            f"{mujoco_xyz[0]:+.4f}  {mujoco_xyz[1]:+.4f}  {mujoco_xyz[2]:+.4f}\n"
-            f"{dh_xyz[0]:+.4f}  {dh_xyz[1]:+.4f}  {dh_xyz[2]:+.4f}\n"
-            f"{error_mm:.4f} mm"
-        )
-        if cfg["has_gripper"]:
-            left_col  += f"\n\nGripper (each finger)"
-            right_col += f"\n\n{f1*1000:.1f} mm  /  {f2*1000:.1f} mm"
+        # ── Update shared state (render_callback reads this) ───────────────
+        state["mujoco_xyz"] = mujoco_xyz
+        state["dh_xyz"]     = dh_xyz
+        state["error_mm"]   = error_mm
 
+        # ── Terminal overlay (old MuJoCo fallback) ─────────────────────────
+        if use_terminal_overlay:
+            print_overlay(cfg, mujoco_xyz, dh_xyz, error_mm,
+                          state["f1"], state["f2"])
+
+        # ── Marker spheres ─────────────────────────────────────────────────
         with viewer.lock():
-            viewer.set_texts((
-                mujoco.mjtFontScale.mjFONTSCALE_150,
-                mujoco.mjtGridPos.mjGRID_TOPLEFT,
-                left_col,
-                right_col,
-            ))
+            viewer.user_scn.ngeom = 0
             draw_sphere(viewer.user_scn, 0, mujoco_xyz, 0.015, [0, 1, 0, 0.8])
             draw_sphere(viewer.user_scn, 1, dh_xyz,     0.025, [1, 0, 0, 0.4])
+            viewer.user_scn.ngeom = 2
         viewer.sync()
 
         time.sleep(0.02)
