@@ -1,0 +1,25 @@
+{
+    "ROS2.distro": "jazzy",
+    "python.autoComplete.extraPaths": [
+        "/home/kush-mehta/ros2_ws/install/smart_forklift/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/install/my_py_pkg/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/build/actions_py",
+        "/home/kush-mehta/ros2_ws/install/actions_py/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/install/my_robot_interfaces/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/install/hybrid_rover_system/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/build/eat_all_turtle",
+        "/home/kush-mehta/ros2_ws/install/eat_all_turtle/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/kush-mehta/ros2_ws/install/smart_forklift/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/install/my_py_pkg/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/build/actions_py",
+        "/home/kush-mehta/ros2_ws/install/actions_py/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/install/my_robot_interfaces/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/install/hybrid_rover_system/lib/python3.12/site-packages",
+        "/home/kush-mehta/ros2_ws/build/eat_all_turtle",
+        "/home/kush-mehta/ros2_ws/install/eat_all_turtle/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ]
+}
