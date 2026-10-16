@@ -1,0 +1,105 @@
+<!--
+  table_scene.xml
+  ===============
+  Standalone MuJoCo scene: table + pick-and-place cube.
+
+  Table dimensions:
+    Length (X) : 0.80 m  (half-size 0.40)
+    Width  (Y) : 0.60 m  (half-size 0.30)
+    Thickness  : 0.04 m  (half-size 0.02)
+    Leg height : 0.38 m  -> table-top surface at z = 0.40 m
+
+  Table top at 0.40 m is within both HEAL and Franka workspace when their
+  bases sit on the floor (z = 0).  Previously 0.74 m was too high.
+
+  Cube:
+    Side : 0.04 m (4 cm)  (half-size 0.02)
+    Default centre: table top + half-cube = 0.40 + 0.02 = 0.42 m
+
+  Launch:
+    python3 launch_table_scene.py
+    OR:  python3 -c "import mujoco.viewer; mujoco.viewer.launch_from_path('table_scene.xml')"
+-->
+
+<mujoco model="table_scene">
+
+  <compiler angle="radian"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <!-- Assets -->
+  <asset>
+    <texture name="grid"   type="2d"     builtin="checker"
+             rgb1="0.18 0.27 0.36"  rgb2="0.12 0.18 0.25"
+             width="400" height="400"/>
+    <texture name="skybox" type="skybox" builtin="gradient"
+             rgb1="0.35 0.55 0.75"  rgb2="0.05 0.05 0.1"
+             width="512" height="3072"/>
+    <material name="ground_mat" texture="grid"
+              texrepeat="4 4"  reflectance="0.15"/>
+    <material name="table_mat"  rgba="0.72 0.58 0.42 1"
+              specular="0.4"   shininess="0.3"/>
+    <material name="leg_mat"    rgba="0.55 0.42 0.28 1"/>
+    <material name="cube_mat"   rgba="0.90 0.25 0.20 1"
+              specular="0.6"   shininess="0.5"/>
+  </asset>
+
+  <default>
+    <geom condim="3" friction="0.8 0.01 0.01"/>
+  </default>
+
+  <worldbody>
+
+    <light name="overhead"   directional="true"
+           diffuse=".55 .55 .55"  specular=".15 .15 .15"
+           pos="0 0 5"  dir="0 0 -1"  castshadow="false"/>
+    <light name="fill_front" directional="true"
+           diffuse=".35 .35 .35"  specular=".05 .05 .05"
+           pos="2 0 2"  dir="-1 0 -0.5"  castshadow="false"/>
+
+    <!-- Ground plane -->
+    <geom name="ground" type="plane" size="0 0 1"
+          pos="0 0 0" material="ground_mat" condim="1"/>
+
+    <!--
+      Table centred at (0, 0.50) in front of a robot at origin — rotated 90°
+      about Z from the original orientation (long axis now along Y).
+      Top surface sits at z = 0.40 m (leg half = 0.19, geom pos z = 0.38).
+    -->
+    <body name="table" pos="0 0.50 0">
+
+      <!-- Table top: half-sizes = (width/2, length/2, thickness/2) — swapped
+           from the original (0.40 0.30) for the 90° flip -->
+      <geom name="table_top"
+            type="box"
+            size="0.30 0.40 0.02"
+            pos="0 0 0.38"
+            material="table_mat"
+            mass="20.0"/>
+
+      <!-- Four legs: 0.38 m tall, 0.03 m square cross-section -->
+      <geom name="leg_fl" type="box" size="0.03 0.03 0.19"
+            pos=" 0.26  0.36 0.19" material="leg_mat" mass="2.0"/>
+      <geom name="leg_fr" type="box" size="0.03 0.03 0.19"
+            pos=" 0.26 -0.36 0.19" material="leg_mat" mass="2.0"/>
+      <geom name="leg_bl" type="box" size="0.03 0.03 0.19"
+            pos="-0.26  0.36 0.19" material="leg_mat" mass="2.0"/>
+      <geom name="leg_br" type="box" size="0.03 0.03 0.19"
+            pos="-0.26 -0.36 0.19" material="leg_mat" mass="2.0"/>
+
+    </body>
+
+    <!-- Pick-and-place cube (free body) -->
+    <body name="cube" pos="0.0 0.50 0.42">
+      <freejoint name="cube_joint"/>
+      <geom name="cube_geom"
+            type="box"
+            size="0.02 0.02 0.02"
+            material="cube_mat"
+            mass="0.15"
+            condim="4"/>
+      <site name="cube_center" size="0.005" rgba="1 1 0 1"/>
+    </body>
+
+  </worldbody>
+
+</mujoco>

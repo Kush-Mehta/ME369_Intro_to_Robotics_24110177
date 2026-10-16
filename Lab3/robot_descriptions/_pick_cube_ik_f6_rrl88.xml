@@ -1,0 +1,259 @@
+<mujoco model="robot_with_table">
+  <!--
+    Combined scene: HEAL arm + gripper + table + cube
+    Edit TABLE_* and CUBE_* defaults below — they cascade everywhere.
+
+    ┌─────────────────────────────────────────────────────┐
+    │  PARAMETRIC TABLE — change these three values only  │
+    │  TABLE_HALF_LEN : half-length along X    │
+    │  TABLE_HALF_WID : half-width  along Y    │
+    │  TABLE_HALF_HGT : half-height of the top slab       │
+    │  LEG_RADIUS     : half-size of each square leg      │
+    └─────────────────────────────────────────────────────┘
+
+    Original table:  length 0.80 m, width 0.60 m, height 0.40 m
+    This scene    :  length 0.80 m, width 0.60 m, height 0.20 m  (half height)
+                     same orientation as Franka → long axis along X
+
+    Table body is placed at  pos="0.0 0.55 0"  so the top surface sits
+    at  z = LEG_HEIGHT + TABLE_HALF_HGT  = 0.16 + 0.02 = 0.18 m
+  -->
+
+  <compiler angle="radian" meshdir="heal_meshes/"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <!-- ══════════════════════════════════════════════════════════
+       TABLE PARAMETERS  ← edit here, nowhere else
+       ══════════════════════════════════════════════════════════ -->
+  <default>
+    <!-- Table geometry (half-sizes in metres) -->
+    <default class="table_top">
+      <!-- size: half_x=TABLE_HALF_LEN  half_y=TABLE_HALF_WID  half_z=TABLE_HALF_HGT -->
+      <!-- Current values: half_x=0.40  half_y=0.30  half_z=0.02 -->
+    </default>
+  </default>
+  <!-- Python-readable parameter block — used by launch scripts
+       TABLE_HALF_LEN  = 0.40   # half-length along X
+       TABLE_HALF_WID  = 0.30   # half-width  along Y
+       TABLE_HALF_HGT  = 0.02   # half-thickness of top slab
+       TABLE_LEG_HALF  = 0.03   # half-size of each leg (square cross-section)
+       TABLE_LEG_HEIGHT= 0.16   # leg height (centre at LEG_HEIGHT/2)
+       TABLE_BODY_POS_X= 0.00   # table body X in world
+       TABLE_BODY_POS_Y= 0.55   # table body Y in world (robot faces +Y)
+       TABLE_TOP_Z     = 0.18   # = TABLE_LEG_HEIGHT + TABLE_HALF_HGT
+       CUBE_HALF       = 0.02   # half-size of pick cube
+  -->
+
+  <asset>
+    <!-- Ground / environment -->
+    <texture name="grid" type="2d" builtin="checker"
+             rgb1="0.18 0.27 0.36" rgb2="0.12 0.18 0.25" width="400" height="400"/>
+    <texture name="skybox" type="skybox" builtin="gradient"
+             rgb1="0.35 0.55 0.75" rgb2="0.05 0.05 0.1" width="512" height="3072"/>
+    <material name="ground_mat"  texture="grid" texrepeat="4 4" reflectance="0.15"/>
+    <material name="groundplane" texture="grid" texuniform="true"
+              texrepeat="5 5" reflectance="0.2"/>
+    <!-- Table -->
+    <material name="table_mat" rgba="0.72 0.58 0.42 1" specular="0.4" shininess="0.3"/>
+    <material name="leg_mat"   rgba="0.55 0.42 0.28 1"/>
+    <material name="cube_mat"  rgba="0.90 0.25 0.20 1" specular="0.6" shininess="0.5"/>
+    <!-- Robot mesh assets -->
+    <material name="black" rgba="0.08 0.08 0.08 1"/>
+    <material name="metal" rgba="0.7 0.7 0.7 1" specular="0.5" shininess="1.0"/>
+    <material name="arm"   rgba="0.75 0.75 0.75 1"/>
+    <mesh name="base_link"     file="base_link.STL"/>
+    <mesh name="link1"         file="link_1.STL"/>
+    <mesh name="link2"         file="link_2.STL"/>
+    <mesh name="link3"         file="link_3.STL"/>
+    <mesh name="link4"         file="link_4.STL"/>
+    <mesh name="link5"         file="link_5.STL"/>
+    <mesh name="end_effector"  file="end_effector.STL"/>
+    <material name="random_tray_mat" rgba="0.05 0.05 0.05 1" specular="0.3" shininess="0.4"/>
+  </asset>
+
+  <worldbody>
+
+    <light name="overhead" directional="true"
+           diffuse=".55 .55 .55" specular=".15 .15 .15"
+           pos="0 0 5" dir="0 0 -1" castshadow="false"/>
+    <light name="fill" directional="true"
+           diffuse=".30 .30 .30" specular=".05 .05 .05"
+           pos="2 0 2" dir="-1 0 -0.5" castshadow="false"/>
+
+    <geom name="ground" type="plane" size="0 0 1" pos="0 0 0"
+          material="ground_mat" condim="1"/>
+
+    <camera name="scene_3d_view" pos="1.2 -0.8 1.0" xyaxes="0.7 0.7 0 -0.4 0.4 0.8"/>
+
+    <!-- ══════════════════════════════════════════════════════════
+         HEAL ARM  (base at world origin)
+         Joint limits all ±π  — consistent with workspace_generator.py
+         ══════════════════════════════════════════════════════════ -->
+    <body name="base_link" pos="0.0 0 0" euler="0 0 0">
+      <geom name="base_link_visual"    type="mesh" mesh="base_link"
+            group="1" contype="0" conaffinity="0" material="arm"/>
+      <geom name="base_link_collision" type="mesh" mesh="base_link"
+            group="0" contype="0" conaffinity="0"/>
+
+      <body name="link_1" pos="0 0 0.171">
+        <inertial pos="-12.54E-03 -0.04E-03 111.27E-03"
+                  quat="0.704455 -0.0304055 0.0162858 0.70891"
+                  mass="7.92" diaginertia="0.00490984 0.00426023 0.00389513"/>
+        <joint name="joint_1" pos="0 0 0" axis="0 0 1"
+               range="-3.14159 3.14159" damping="55" frictionloss="0.1"
+               actuatorfrcrange="-10000 10000"/>
+        <geom name="link_1_visual"    type="mesh" mesh="link1"
+              group="1" contype="0" conaffinity="0" material="arm"/>
+        <geom name="link_1_collision" type="mesh" mesh="link1" group="0"/>
+
+        <body name="link_2" pos="0 0.0875 0.1498" quat="0.707105 0.707108 0 0">
+          <inertial pos="-0.00017021 0.1561 -0.016973"
+                    quat="0.499892 0.50026 -0.499813 0.500035"
+                    mass="1.24" diaginertia="0.0097684 0.0086581 0.0014536"/>
+          <joint name="joint_2" pos="0 0 0" axis="0 0 -1"
+                 range="-3.14159 3.14159" damping="55" frictionloss="0.1"
+                 actuatorfrcrange="-10000 10000"/>
+          <geom name="link_2_visual"    type="mesh" mesh="link2"
+                group="1" contype="0" conaffinity="0" material="arm"/>
+          <geom name="link_2_collision" type="mesh" mesh="link2" group="0"/>
+
+          <body name="link_3" pos="0 0.3 0" euler="0 0 -1.57">
+            <inertial pos="-7.5516e-07 0 0.073251"
+                      quat="0.495149 0.509997 -0.506629 0.487912"
+                      mass="5.57" diaginertia="0.0048786 0.00425304 0.00369796"/>
+            <joint name="joint_3" pos="0 0 0" axis="0 0 1"
+                   range="-3.14159 3.14159" damping="55" frictionloss="0.1"
+                   actuatorfrcrange="-10000 10000"/>
+            <geom name="link_3_visual"    type="mesh" mesh="link3"
+                  group="1" contype="0" conaffinity="0" material="arm"/>
+            <geom name="link_3_collision" type="mesh" mesh="link3" group="0"/>
+
+            <body name="link_4" pos="0 0.1593 0.0875" euler="-1.57 0 0">
+              <inertial pos="1.3303e-05 0.06 0.10412"
+                        quat="0.313668 0.63349 -0.634256 0.313086"
+                        mass="1.9" diaginertia="0.00162547 0.0014257 0.00104183"/>
+              <joint name="joint_4" pos="0 0 0" axis="0 0 1"
+                     range="-3.14159 3.14159" damping="55" frictionloss="0.1"
+                     actuatorfrcrange="-10000 10000"/>
+              <geom name="link_4_visual"    type="mesh" mesh="link4"
+                    group="1" contype="0" conaffinity="0" material="arm"/>
+              <geom name="link_4_collision" type="mesh" mesh="link4" group="0"/>
+
+              <body name="link_5" pos="0 0.03185 0.16105" euler="0.50951 0 1.57">
+                <inertial pos="-5.6194e-05 -0.046 0.059696"
+                          quat="0.457117 0.537094 0.438555 0.556994"
+                          mass="1.78" diaginertia="0.000913478 0.000827593 0.000774169"/>
+                <joint name="joint_5" pos="0 0 0" axis="0 0 1"
+                       range="-3.14159 3.14159" damping="55" frictionloss="0.1"
+                       actuatorfrcrange="-10000 10000"/>
+                <geom name="link_5_visual"    type="mesh" mesh="link5"
+                      group="1" contype="0" conaffinity="0" material="arm"/>
+                <geom name="link_5_collision" type="mesh" mesh="link5" group="0"/>
+
+                <!-- End-effector flange -->
+                <body name="end_effector" pos="0 -0.1227 0.0654"
+                      quat="0.707105 0.707108 0 0">
+                  <body name="right_hand" pos="0.0 0.0 0.0" quat="1 0 0 0">
+                    <camera mode="fixed" name="right_eye_in_hand"
+                            pos="0.05 0 0" quat="0.5 0.5 -0.5 -0.5" fovy="75"/>
+                  </body>
+                  <inertial pos="7.0245e-06 -0.00022138 -0.016847"
+                            quat="-0.0128774 0.707029 0.00995758 0.706998"
+                            mass="0.001"
+                            diaginertia="0.000326122 0.000191249 0.000189678"/>
+                  <joint name="joint_6" pos="0 0 0" axis="0 0 -1"
+                         range="-3.14159 3.14159" damping="55" frictionloss="0.1"
+                         actuatorfrcrange="-10000 10000"/>
+                  <site name="right_center" pos="0 0 0" size="0.01"
+                        rgba="1 0.3 0.3 1" group="1"/>
+                  <geom name="end_effector_visual"    type="mesh" mesh="end_effector"
+                        group="1" contype="0" conaffinity="0" material="arm"/>
+                  <geom name="end_effector_collision" type="mesh" mesh="end_effector"
+                        group="0"/>
+                </body>
+
+                <!-- Robotiq 2F-85 is attached to right_center by the DLS launcher. -->
+
+              </body><!-- end link_5 -->
+            </body><!-- end link_4 -->
+          </body><!-- end link_3 -->
+        </body><!-- end link_2 -->
+      </body><!-- end link_1 -->
+    </body><!-- end base_link -->
+
+    <!-- ══════════════════════════════════════════════════════════
+         TABLE — half height, orientation matched to Franka
+         ─────────────────────────────────────────────────────────
+         Long axis  : along X  (TABLE_HALF_LEN = 0.40 m)
+         Short axis : along Y  (TABLE_HALF_WID = 0.30 m)
+         Total height: legs 0.16 m + slab 0.02 m = 0.18 m top surface
+         Body placed at Y=0.55 so the robot (at origin) can reach it.
+         ══════════════════════════════════════════════════════════ -->
+    <!--  ▼ TABLE PARAMETRIC BLOCK — edit TABLE_* values here ▼
+          TABLE_HALF_LEN = 0.40   → geom size x
+          TABLE_HALF_WID = 0.30   → geom size y
+          TABLE_HALF_HGT = 0.02   → geom size z  and leg pos z adjust
+          TABLE_LEG_HALF = 0.03   → leg geom size x and y
+          TABLE_LEG_HEIGHT= 0.16  → leg pos z = LEG_HEIGHT/2, top pos z = LEG_HEIGHT + HGT
+          TABLE_BODY_POS  = "0.0 0.55 0"
+    -->
+    <body name="table" pos="0.0 0.55 0">
+      <!-- Top slab:  x=TABLE_HALF_LEN  y=TABLE_HALF_WID  z=TABLE_HALF_HGT
+                      pos z = TABLE_LEG_HEIGHT + TABLE_HALF_HGT = 0.16+0.02 = 0.18 -->
+      <geom name="table_top" type="box" size="0.40 0.30 0.02"
+            pos="0 0 0.18" material="table_mat" mass="20.0"/>
+      <!-- Legs: pos x = ±(TABLE_HALF_LEN - TABLE_LEG_HALF) = ±0.37
+                 pos y = ±(TABLE_HALF_WID - TABLE_LEG_HALF) = ±0.27
+                 pos z = TABLE_LEG_HEIGHT/2 = 0.08
+                 size z = TABLE_LEG_HEIGHT/2 = 0.08 -->
+      <geom name="leg_fl" type="box" size="0.03 0.03 0.08"
+            pos=" 0.37  0.27 0.08" material="leg_mat" mass="1.5"/>
+      <geom name="leg_fr" type="box" size="0.03 0.03 0.08"
+            pos=" 0.37 -0.27 0.08" material="leg_mat" mass="1.5"/>
+      <geom name="leg_bl" type="box" size="0.03 0.03 0.08"
+            pos="-0.37  0.27 0.08" material="leg_mat" mass="1.5"/>
+      <geom name="leg_br" type="box" size="0.03 0.03 0.08"
+            pos="-0.37 -0.27 0.08" material="leg_mat" mass="1.5"/>
+    </body>
+
+    <!-- ══════════════════════════════════════════════════════════
+         CUBE — default pos at table centre; launcher randomises it
+         Cube centre z = TABLE_TOP_Z + CUBE_HALF = 0.18 + 0.02 = 0.20
+         ══════════════════════════════════════════════════════════ -->
+    <body name="cube" pos="0.0 0.55 0.20">
+      <freejoint name="cube_joint"/>
+      <geom name="cube_geom" type="box" size="0.02 0.02 0.02"
+            material="cube_mat" mass="0.15" condim="4"/>
+      <site name="cube_center" size="0.005" rgba="1 1 0 1"/>
+    </body>
+
+  
+    <body name="random_tray" pos="0 0 0.20600000">
+      <geom name="random_tray_floor" type="box" size="0.075 0.095 0.006" material="random_tray_mat" friction="0.8 0.1 0.1"/>
+      <geom name="random_tray_wall_y_pos" type="box" size="0.075 0.008 0.025" pos="0 0.087000 0.031000" material="random_tray_mat"/>
+      <geom name="random_tray_wall_y_neg" type="box" size="0.075 0.008 0.025" pos="0 -0.087000 0.031000" material="random_tray_mat"/>
+      <geom name="random_tray_wall_x_pos" type="box" size="0.008 0.095 0.025" pos="0.067000 0 0.031000" material="random_tray_mat"/>
+      <geom name="random_tray_wall_x_neg" type="box" size="0.008 0.095 0.025" pos="-0.067000 0 0.031000" material="random_tray_mat"/>
+    </body>
+  </worldbody>
+
+
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       ACTUATORS — position servos so the MuJoCo ctrl sliders act
+       as joint-angle setpoints.  The launch script drives ctrl[]
+       smoothly via linear interpolation (no PID in Python).
+       ══════════════════════════════════════════════════════════ -->
+  <actuator>
+    <position name="turret"   joint="joint_1" kp="800" kv="80"/>
+    <position name="shoulder" joint="joint_2" kp="800" kv="80"/>
+    <position name="elbow"    joint="joint_3" kp="800" kv="80"/>
+    <position name="wrist_1"  joint="joint_4" kp="400" kv="40"/>
+    <position name="wrist_2"  joint="joint_5" kp="400" kv="40"/>
+    <position name="wrist_3"  joint="joint_6" kp="400" kv="40"/>
+  <position name="gripper_left_driver" joint="left_driver_joint" kp="20" kv="2" ctrllimited="true" ctrlrange="0 1.10" forcelimited="true" forcerange="-4 4"/>
+<position name="gripper_right_driver" joint="right_driver_joint" kp="20" kv="2" ctrllimited="true" ctrlrange="0 1.10" forcelimited="true" forcerange="-4 4"/>
+  </actuator>
+
+</mujoco>
