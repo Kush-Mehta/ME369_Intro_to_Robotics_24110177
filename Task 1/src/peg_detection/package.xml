@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>peg_detection</name>
+  <version>0.2.0</version>
+  <description>
+    Colour-based 3D detection of pegs (yellow, green, blue, orange) and an ArUco
+    robot-base marker using an Intel RealSense D435i through ROS 2 Jazzy;
+    outputs peg top-face and socket centres in the ROBOTIS link1 frame.
+  </description>
+  <maintainer email="kshitij@todo.todo">kshitij</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- ROS client library and message types -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>rcl_interfaces</exec_depend>
+
+  <!-- Time synchronisation of colour + depth, and TF broadcasting -->
+  <exec_depend>message_filters</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+  <!-- Launch system and the camera driver it starts -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>realsense2_camera</exec_depend>
+
+  <!-- Python numerics / vision (already installed via pip on this laptop) -->
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

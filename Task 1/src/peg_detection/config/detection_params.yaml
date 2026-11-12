@@ -1,0 +1,116 @@
+# Parameters for the peg_detector node.
+# The top-level key must match the node name.
+#
+# HSV in OpenCV: H 0-179 (degrees / 2), S 0-255, V 0-255.
+# Thresholds depend on lighting. Tune live without restarting, e.g.:
+#   ros2 param set /peg_detector colours.green.hsv_lower "[34, 80, 60]"
+# Then copy good values back into this file.
+
+peg_detector:
+  ros__parameters:
+    color_topic: /camera/camera/color/image_raw
+    depth_topic: /camera/camera/aligned_depth_to_color/image_raw
+    camera_info_topic: /camera/camera/color/camera_info
+
+    sync_slop_s: 0.05          # max colour/depth stamp difference to pair (s)
+    sync_queue_size: 10
+    print_period_s: 1.0        # terminal report every N seconds
+    publish_debug_mask: true   # ~/debug_mask topic, useful while tuning HSV
+
+    # ---- depth ----
+    depth_scale: 0.001         # 16UC1 depth is in millimetres
+    depth_min_m: 0.15
+    depth_max_m: 2.0
+    depth_erode_px: 3          # stay away from blob edges (mixed depths)
+    depth_min_valid_px: 30
+    depth_min_valid_fraction: 0.2
+
+    # ---- colour segmentation ----
+    blur_kernel: 5
+    morph_kernel: 5
+    min_area_px: 300.0
+    max_area_px: 60000.0
+    min_fill_ratio: 0.6        # rejects the thin red socket outlines
+    max_per_colour: 1          # one peg of each colour
+    overlap_iou: 0.5
+    shape_epsilon: 0.03        # approxPolyDP tolerance (fraction of perimeter)
+
+    colour_names: [yellow, green, blue, orange]
+
+    # expected_shape = what you know each peg is (from your setup photo).
+    # Reported alongside the geometric guess, clearly labelled.
+    colours:
+      yellow:
+        hsv_lower: [18, 120, 120]
+        hsv_upper: [33, 255, 255]
+        draw_bgr: [0, 255, 255]
+        expected_shape: triangle
+      green:
+        hsv_lower: [34, 80, 60]     # lime-green peg; upper H kept below the teal foam (~80-90)
+        hsv_upper: [75, 255, 255]
+        draw_bgr: [0, 200, 0]
+        expected_shape: circle
+      blue:
+        hsv_lower: [98, 120, 50]
+        hsv_upper: [130, 255, 255]
+        draw_bgr: [255, 120, 0]
+        expected_shape: square
+      orange:
+        hsv_lower: [3, 130, 120]
+        hsv_upper: [17, 255, 255]
+        draw_bgr: [0, 128, 255]
+        expected_shape: hexagon
+
+    smoothing_frames: 7        # published positions = median of the last N frames
+
+    # ---- peg top face (the fix for off-centre pegs) ----
+    # Every blob pixel is turned into a 3D point in the robot frame; the points within
+    # top_band_m of the highest one are the top face; its area centroid is the peg centre.
+    peg_top:
+      erode_px: 2                # ignore the blob edge (mixed foreground/background depth)
+      top_percentile: 95.0       # "highest point" = this percentile of heights
+      top_band_m: 0.006          # top face = within 6 mm of it
+      min_top_px: 25
+
+    # ---- robot base reference (ArUco marker) ----
+    marker:
+      enabled: true
+      dictionary: DICT_4X4_50
+      id: 4
+      length_m: 0.0374               # MEASURED side of the printed black square (m)
+      # Where the marker CENTRE is, measured from the drawn origin along
+      # the axes drawn on the foam (+X away from the board, +Y toward the marker sheet, +Z up), m.
+      # Our setup: the QR (marker) CENTRE itself is the board origin.
+      position_in_base_m: [0.0, 0.0, 0.0]
+      # Angle of the marker's +X (red axis in annotated_image) from drawn +X,
+      # counter-clockwise seen from above. Usually 0, 90, 180 or -90.
+      yaw_in_base_deg: 90.0
+      frame_id: robot_base_marker
+      publish_tf: true
+      # Small marker seen at an angle -> noisy distance/tilt. Refine with the flat table
+      # around it from the depth image (also makes the frame consistent with peg depths).
+      refine_with_depth: true
+      refine_mode: table             # table: tilt from the WHOLE table plane (robust); local: patch round the marker
+      max_reproj_px: 2.0             # ignore marker detections worse than this
+      # Camera is fixed: average the pose over N frames, then FREEZE it, so the arm can
+      # cover the marker. Moved the camera? ros2 service call /peg_detector/recalibrate std_srvs/srv/Trigger
+      freeze: true
+      freeze_frames: 30
+      drift_warn_mm: 8.0             # warn if the live marker disagrees with the frozen pose
+      save_file: ~/omx_calibration/camera_pose.yaml
+      load_saved: false              # true: start with the last frozen pose (marker may be hidden)
+
+    # ---- drawn foam axes -> the arm's frame (ROBOTIS link1, what the IK uses) ----
+    #   p_link1 = Rz(yaw_deg) * p_drawn + offset_m
+    # 0 / [0,0,0] = the drawn origin IS link1. Measure it with:
+    #   ros2 run peg_detection frame_calibration --ros-args -p colour:=green
+    robot_frame:
+      frame_id: link1
+      # Our setup: board axes parallel to the robot axes (robot +x = board +x, away from
+      # the sockets), base joint (joint1) axis 38 mm from the QR centre along +x.
+      # link1 origin is 12 mm behind the joint1 axis -> link1 = board - (0.038 - 0.012) in x.
+      # Wizard step 7 (touch calibration) refines these numbers.
+      yaw_deg: 0.0
+      offset_m: [-0.038, 0.0, 0.0]
+      publish_camera_tf: true        # TF link1 -> camera_link (RViz: cloud over the arm model)
+      camera_root_frame: camera_link
